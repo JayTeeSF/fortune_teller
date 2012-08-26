@@ -14,7 +14,12 @@ module FortuneTeller
     end
 
     def pick
+      require "rubygame"
       puts "Flick, flick, flick, flick...\n"
+      if defined?(Rubygame::Sound)
+        sound = Rubygame::Sound.load('flick_flick.ogg')
+        sound.play
+      end
       reveal.choose
     end
   end
