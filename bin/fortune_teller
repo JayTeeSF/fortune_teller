@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+begin
+  require 'rubygems'
+  gem 'fortune_teller'
+  require 'fortune_teller'
+rescue LoadError
+  require_relative "../lib/fortune_teller"
+end
+
+FortuneTeller::Game.new.run
