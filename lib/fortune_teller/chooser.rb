@@ -52,7 +52,7 @@ module FortuneTeller
     def choose
       choice = nil
       begin
-        self.class.clear_screen( 1.2 )
+        self.class.clear_screen
         choice = self.class.prompt( list_renderer.render( selections | [:exit] ) )
         Logger.log("got: #{choice.inspect}")
       end until( valid?( choice ) )

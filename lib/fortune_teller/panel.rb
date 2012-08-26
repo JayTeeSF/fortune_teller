@@ -15,15 +15,21 @@ module FortuneTeller
 
     def pick
       puts "Flick, flick, flick, flick...\n"
-      begin
-        require "rubygame"
-        if defined?(Rubygame::Sound)
-          sound = Rubygame::Sound.load('flick_flick.ogg')
-          sound.play
-        end
-      ensure
-        reveal.choose
-      end
+      sound.play
+      sleep(1.2)
+      reveal.choose
+    end
+
+    private
+
+    def sound
+      @sound ||= begin
+                   require "rubygame"
+                   if defined?(Rubygame::Sound)
+                     Rubygame::Sound.load('flick_flick.ogg')
+                   end
+                 rescue
+                 end
     end
   end
 end
