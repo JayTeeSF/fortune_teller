@@ -8,4 +8,4 @@ rescue LoadError
   require_relative "../lib/fortune_teller"
 end
 
-FortuneTeller::Game.new.run
+FortuneTeller::Game.run

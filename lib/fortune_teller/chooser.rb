@@ -3,6 +3,23 @@ require_relative "logger"
 module FortuneTeller
   class Chooser
     LOCATIONS = [ :tl, :tr, :bl, :br ]
+
+    def self.subset(list, num=list.size)
+      Logger.log("got list: #{list.inspect}, num: #{num.inspect}")
+      choices = list.dup
+      num.times.collect {|num|
+        reduce_choices!(choices)
+      }
+    end
+
+    def self.reduce_choices!( choices, by=random_choice(choices) )
+      choices.delete(by)
+    end
+
+    def self.random_choice(choices)
+      choices[rand(choices.size)]
+    end
+
     attr_reader :tl_panel, :tr_panel, :bl_panel, :br_panel
     attr_reader :list_renderer
     def initialize(_tl_panel, _tr_panel, _bl_panel = nil, _br_panel = nil, options = {})

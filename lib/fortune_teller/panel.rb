@@ -14,8 +14,8 @@ module FortuneTeller
     end
 
     def pick
-      puts "Flick, flick, flick, flick...\n"
       sound.play
+      puts "Flick, flick, flick, flick...\n"
       sleep(1.2)
       reveal.choose
     end
