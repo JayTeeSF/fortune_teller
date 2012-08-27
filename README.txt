@@ -47,10 +47,11 @@ To integrate with your own code...
    fortunes = FortuneTeller::Game::DEFAULT_FORTUNES
 
    # options include the :ui to use, default is CliUi
+   options = { :ui => YourUiImplementation.new }
 
    game = FortuneTeller::Game.new( selection_groups, fortunes, options )
 
    game.run
 
 TODO:
-  confirm (i.e. create proof-of-concept) that modularized & injected dependencies (i.e. :ui) work w/ Commandline, Ruby, Rubygame, etc...
+  confirm (i.e. create proof-of-concept) that modularized & injected dependencies (i.e. :ui) work w/ alternatives: Commandline, Rails, Rubygame, etc...
