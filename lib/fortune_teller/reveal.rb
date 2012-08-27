@@ -1,8 +1,7 @@
 module FortuneTeller
   class Reveal < Panel
     def choose
-      puts self
-      exit
+      ui.exit( self.to_s )
     end
   end
 end

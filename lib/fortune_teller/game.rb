@@ -1,4 +1,5 @@
 require_relative "chooser"
+require_relative "cli_ui"
 module FortuneTeller
   class Game
     DEFAULT_SELECTION_GROUPS = [
@@ -18,14 +19,31 @@ module FortuneTeller
     def self.run( options = {} )
       options[:selection_groups] ||= DEFAULT_SELECTION_GROUPS.map(&:call)
       options[:fortunes] ||= DEFAULT_FORTUNES
-      new( options[:selection_groups], options[:fortunes] ).run
+      new( options.delete(:selection_groups), options.delete(:fortunes), options ).run
     end
 
     attr_reader :selection_groups, :fortunes
-    def initialize( selection_groups, fortunes )
+    attr_reader :chooser_class, :reveal_class, :panel_class
+    attr_reader :chooser_options
+    attr_reader :ui
+    def initialize( selection_groups, fortunes, options = {} )
       @original_selection_groups = selection_groups
       @original_fortunes = fortunes
+      
+      @ui = options[:ui] || CliUi.new(:game => self)
+
+      @chooser_class = options[:choose_class] || Chooser
+      @reveal_class = options[:reveal_class] || Reveal
+      @panel_class = options[:panel_class] || Panel
+      @chooser_options = options[:chooser_options] || {}
+      @chooser_options[:ui] ||= ui
+
       reset
+    end
+
+    def restart
+      reset
+      run
     end
 
     def reset
@@ -42,24 +60,25 @@ module FortuneTeller
 
     def fortune_reveals
       @fortune_reveals ||= fortunes.map { |fortune|
-        Reveal.new( fortune )
+        reveal_class.new( fortune, :ui => ui )
       }
     end
 
     def final_choices
       @final_choices ||= selection_groups.pop.map { |selection|
         Logger.log("fc-selection: #{selection.inspect}")
-        Panel.new( selection, Chooser.reduce_choices!(fortune_reveals) )
+        panel_class.new( selection, :reveal => chooser_class.reduce_choices!(fortune_reveals), :ui => ui )
       }
     end
 
     def final_chooser
-      @final_chooser ||= Chooser.new( Chooser.reduce_choices!(final_choices), Chooser.reduce_choices!(final_choices) )
+      @final_chooser ||= chooser_class.new( chooser_class.reduce_choices!(final_choices), chooser_class.reduce_choices!(final_choices), chooser_options )
     end
 
     def chooser_tree
       @chooser_tree ||= generate_choosers
     end
+
 
     def generate_choosers
       choosers = [ final_chooser ]
@@ -67,10 +86,14 @@ module FortuneTeller
         panels = []
         if selection_group = selection_groups.pop
           selection_group.each do |selection|
-            panels << Panel.new( selection, choosers.first )
+            panels << panel_class.new( selection, :reveal => choosers.first, :ui => ui )
           end
         end
-        choosers.unshift Chooser.new( *panels )
+        chooser_params = panels.pop, panels.pop
+        chooser_options[:bl_panel] = panels.pop if panels.first
+        chooser_options[:br_panel] = panels.pop if panels.first
+        chooser_params << chooser_options
+        choosers.unshift chooser_class.new( *chooser_params )
       end until [] == selection_groups
       return choosers.first
     end

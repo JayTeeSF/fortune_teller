@@ -3,9 +3,11 @@ module FortuneTeller
   class Panel
     attr_reader :label
     attr_accessor :reveal
-    def initialize(_label, _reveal = nil )
-      @label = _label
-      @reveal = _reveal ||= NilPanel.new
+    attr_accessor :ui
+    def initialize(label, options = {} )
+      @label = label
+      @ui = options[:ui]
+      @reveal = options[:reveal] || NilPanel.new(@ui)
     end
     alias_method :to_s, :label
 
@@ -14,23 +16,10 @@ module FortuneTeller
     end
 
     def pick
-      sound.play
-      puts "Flick, flick, flick, flick...\n"
-      sleep(1.2)
+      ui.interstitial( "Flick, flick, flick, flick..." )
       reveal.choose
     end
 
-    private
-
-    def sound
-      @sound ||= begin
-                   require "rubygame"
-                   if defined?(Rubygame::Sound)
-                     Rubygame::Sound.load('flick_flick.ogg')
-                   end
-                 rescue
-                 end
-    end
   end
 end
 require_relative "reveal"

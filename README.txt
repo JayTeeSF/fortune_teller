@@ -1,5 +1,13 @@
-Total hack of a commandline Ruby version of an origami fortune teller:
-  http://en.wikipedia.org/wiki/Paper_fortune_teller
+What?
+  A total hack
+  A Ruby-based commandline version of an origami fortune-teller:
+    http://en.wikipedia.org/wiki/Paper_fortune_teller
+
+Why?
+ Cuz my kids were making paper fortune-tellers and I thought I'd
+ inspire them with a little computer-science
+ (so far they just like that I can change my fortune-teller faster than
+they can)
 
 To use it simply...
   install it:
@@ -27,6 +35,22 @@ At which point, you type your selection, followed by pressing the
 enter-key
 ...it's that easy.
 
+To integrate with your own code...
+  require 'fortune_teller'
+  
+  And have fun (see FortuneTeller::Game.run):
+
+   # array of array of strings
+   selection_groups = FortuneTeller::Game::DEFAULT_SELECTION_GROUPS.map(&:call)
+
+   # array of strings
+   fortunes = FortuneTeller::Game::DEFAULT_FORTUNES
+
+   # options include the :ui to use, default is CliUi
+
+   game = FortuneTeller::Game.new( selection_groups, fortunes, options )
+
+   game.run
+
 TODO:
-  custom fortune-teller
-  graphics
+  confirm (i.e. create proof-of-concept) that modularized & injected dependencies (i.e. :ui) work w/ Commandline, Ruby, Rubygame, etc...

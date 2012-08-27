@@ -21,15 +21,16 @@ module FortuneTeller
     end
 
     attr_reader :tl_panel, :tr_panel, :bl_panel, :br_panel
-    attr_reader :list_renderer
-    def initialize(_tl_panel, _tr_panel, _bl_panel = nil, _br_panel = nil, options = {})
+    attr_reader :list_renderer, :ui
+    def initialize(_tl_panel, _tr_panel, options = {})
+      @ui = options[:ui]
       @tl_panel = _tl_panel
       Logger.log "tl_panel: #{@tl_panel}"
       @tr_panel = _tr_panel
       Logger.log "tr_panel: #{@tr_panel}"
-      @bl_panel = _bl_panel || NilPanel.new
+      @bl_panel = options[:bl_panel] || NilPanel.new(@ui)
       Logger.log "bl_panel: #{@bl_panel}"
-      @br_panel = _br_panel || NilPanel.new
+      @br_panel = options[:br_panel] || NilPanel.new(@ui)
       Logger.log "br_panel: #{@br_panel}"
       @list_renderer = options[:list_renderer] || ListRenderer.new
       define_selection_aliases
@@ -69,31 +70,22 @@ module FortuneTeller
     def choose
       choice = nil
       begin
-        self.class.clear_screen
-        choice = self.class.prompt( list_renderer.render( selections | [:exit] ) )
+        ui.clear_screen
+        choice = ui.prompt( list_renderer.render( selections | [:exit] ) )
         Logger.log("got: #{choice.inspect}")
       end until( valid?( choice ) )
       Logger.log("trying it...")
-      self.class.clear_screen(1)
+      ui.clear_screen(1)
+      # need to unalias methods...
       send( choice )
-    end
-
-    def self.clear_screen( after = 0 )
-      sleep( after )
-      puts "\e[H\e[2J"
     end
 
     LOCATIONS.each do |location|
       define_method(location) {
-        send( "#{location}_panel" ).pick
+        send( "#{location}_panel" ).tap do |panel|
+          panel.pick
+        end
       }
-    end
-
-    def self.prompt(text)
-      print text
-      gets.chomp.tap do |result|
-        puts
-      end
     end
   end
 end

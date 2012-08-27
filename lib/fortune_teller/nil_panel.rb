@@ -1,5 +1,9 @@
 module FortuneTeller
   class NilPanel
+    attr_reader :ui
+    def initialize(ui)
+      @ui = ui
+    end
     def to_s
       ""
     end
@@ -9,11 +13,11 @@ module FortuneTeller
     end
 
     def pick
-      Kernel.exit
+      ui.exit
     end
 
     def choose
-      Kernel.exit
+      ui.exit
     end
   end
 end
